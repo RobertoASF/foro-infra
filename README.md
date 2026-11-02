@@ -95,12 +95,19 @@ erDiagram
 
 ## Cómo levantarlo
 
-Necesitas Docker Desktop, una Autonomous Database en Oracle Cloud y su Wallet descomprimido. Los tres repositorios van en la misma carpeta:
+Necesitas Docker Desktop y una Autonomous Database en Oracle Cloud. Descomprime su Wallet en la raíz del disco:
+
+```
+C:\Wallet_dbfullstack3
+```
+
+En Linux o macOS, déjalo en `/Wallet_dbfullstack3` y cambia `WALLET_DIR` en el `.env`.
+
+Los tres repositorios van en la misma carpeta:
 
 ```
 carpeta/
 ├── foro-infra/
-│   └── Wallet_dbfullstack3/
 ├── foro-ms-usuarios/
 └── foro-ms-publicaciones/
 ```

@@ -13,7 +13,7 @@ services:
       LOG_NIVEL: DEBUG
       TZ: America/Santiago
     volumes:
-      - ./${WALLET_DIR}:/wallet:ro
+      - ${WALLET_DIR}:/wallet:ro
     ports:
       - "8081:8081"
     healthcheck:
@@ -35,7 +35,7 @@ services:
       LOG_NIVEL: DEBUG
       TZ: America/Santiago
     volumes:
-      - ./${WALLET_DIR}:/wallet:ro
+      - ${WALLET_DIR}:/wallet:ro
     ports:
       - "8082:8082"
     healthcheck:
@@ -56,7 +56,7 @@ services:
       DB_USUARIOS_PASSWORD: ${DB_USUARIOS_PASSWORD}
       DB_PUBLICACIONES_PASSWORD: ${DB_PUBLICACIONES_PASSWORD}
     volumes:
-      - ./${WALLET_DIR}:/wallet:ro
+      - ${WALLET_DIR}:/wallet:ro
       - ./db:/scripts:ro
       - ../foro-ms-usuarios/db:/sql/usuarios:ro
       - ../foro-ms-publicaciones/db:/sql/publicaciones:ro
