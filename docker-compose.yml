@@ -1,0 +1,26 @@
+name: foro
+
+services:
+  oracle:
+    image: gvenzl/oracle-free:23-slim-faststart
+    container_name: foro-oracle
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      DB_USUARIOS_PASSWORD: ${DB_USUARIOS_PASSWORD}
+      DB_PUBLICACIONES_PASSWORD: ${DB_PUBLICACIONES_PASSWORD}
+    ports:
+      - "127.0.0.1:1521:1521"
+    volumes:
+      - oracle-datos:/opt/oracle/oradata
+      - ./db/00_iniciar_bd.sh:/container-entrypoint-initdb.d/00_iniciar_bd.sh:ro
+      - ../foro-ms-usuarios/db:/sql/usuarios:ro
+      - ../foro-ms-publicaciones/db:/sql/publicaciones:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+volumes:
+  oracle-datos:
