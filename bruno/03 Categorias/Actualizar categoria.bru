@@ -1,0 +1,29 @@
+meta {
+  name: Actualizar categoria
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{publicaciones}}/api/categorias/{{idCategoriaNueva}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+body:json {
+  {
+    "nombre": "{{nombreCategoria}}",
+    "descripcion": "Descripción actualizada"
+  }
+}
+
+tests {
+  test("guarda la nueva descripcion", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.descripcion).to.equal("Descripción actualizada");
+  });
+}

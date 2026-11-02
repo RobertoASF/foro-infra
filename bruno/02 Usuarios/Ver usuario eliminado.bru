@@ -1,0 +1,21 @@
+meta {
+  name: Ver usuario eliminado
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{usuarios}}/api/usuarios/{{idNuevo}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+tests {
+  test("responde 404", function () {
+    expect(res.status).to.equal(404);
+  });
+}

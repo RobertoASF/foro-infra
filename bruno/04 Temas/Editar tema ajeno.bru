@@ -1,0 +1,29 @@
+meta {
+  name: Editar tema ajeno
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{publicaciones}}/api/temas/{{idTema}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenModerador}}
+}
+
+body:json {
+  {
+    "titulo": "Intento de edicion",
+    "contenido": "Solo el autor puede editar.",
+    "categoriaId": {{idCategoria}}
+  }
+}
+
+tests {
+  test("responde 403 aunque sea moderador", function () {
+    expect(res.status).to.equal(403);
+  });
+}

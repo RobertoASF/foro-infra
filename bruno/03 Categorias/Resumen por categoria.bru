@@ -1,0 +1,20 @@
+meta {
+  name: Resumen por categoria
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{publicaciones}}/api/categorias/resumen
+  body: none
+  auth: none
+}
+
+tests {
+  test("cuenta temas y comentarios de cada categoria", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body[0]).to.have.property("totalTemas");
+    expect(res.body[0]).to.have.property("totalComentarios");
+    expect(res.body[0]).to.have.property("ultimoTema");
+  });
+}

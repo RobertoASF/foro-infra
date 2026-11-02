@@ -1,0 +1,28 @@
+meta {
+  name: Comentar vacio
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{publicaciones}}/api/temas/{{idTema}}/comentarios
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenCamila}}
+}
+
+body:json {
+  {
+    "contenido": "   "
+  }
+}
+
+tests {
+  test("responde 400 e indica el campo", function () {
+    expect(res.status).to.equal(400);
+    expect(res.body.detalles).to.have.property("contenido");
+  });
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Publicar con categoria inexistente
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{publicaciones}}/api/temas
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenCamila}}
+}
+
+body:json {
+  {
+    "titulo": "Categoria que no existe",
+    "contenido": "No deberia guardarse.",
+    "categoriaId": 999999
+  }
+}
+
+tests {
+  test("responde 404", function () {
+    expect(res.status).to.equal(404);
+  });
+}

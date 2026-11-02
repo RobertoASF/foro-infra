@@ -1,0 +1,22 @@
+meta {
+  name: Moderador borra comentario ajeno
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{publicaciones}}/api/comentarios/{{idComentario}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenModerador}}
+}
+
+tests {
+  test("el moderador puede borrarlo", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.mensaje).to.equal("Comentario eliminado");
+  });
+}

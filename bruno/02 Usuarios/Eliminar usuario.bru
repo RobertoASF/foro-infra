@@ -1,0 +1,22 @@
+meta {
+  name: Eliminar usuario
+  type: http
+  seq: 15
+}
+
+delete {
+  url: {{usuarios}}/api/usuarios/{{idNuevo}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+tests {
+  test("elimina la cuenta y responde en json", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.mensaje).to.equal("Usuario eliminado");
+  });
+}

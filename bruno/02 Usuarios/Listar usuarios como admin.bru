@@ -1,0 +1,22 @@
+meta {
+  name: Listar usuarios como admin
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{usuarios}}/api/usuarios
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+tests {
+  test("devuelve al menos los usuarios iniciales", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.length).to.be.at.least(4);
+  });
+}

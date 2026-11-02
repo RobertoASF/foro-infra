@@ -1,0 +1,24 @@
+meta {
+  name: Login de usuario inactivo
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{usuarios}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombreUsuario": "{{nombreNuevo}}",
+    "password": "ClaveNueva2026*"
+  }
+}
+
+tests {
+  test("una cuenta inactiva no puede entrar", function () {
+    expect(res.status).to.equal(401);
+  });
+}

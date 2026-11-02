@@ -1,0 +1,17 @@
+meta {
+  name: Ver tema eliminado
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{publicaciones}}/api/temas/{{idTema}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("responde 404", function () {
+    expect(res.status).to.equal(404);
+  });
+}

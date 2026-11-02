@@ -1,0 +1,32 @@
+meta {
+  name: Comentar tema
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{publicaciones}}/api/temas/{{idTema}}/comentarios
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenCamila}}
+}
+
+body:json {
+  {
+    "contenido": "Primer comentario desde Bruno."
+  }
+}
+
+vars:post-response {
+  idComentario: res.body.id
+}
+
+tests {
+  test("crea el comentario", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.autorNombre).to.equal("camila");
+  });
+}

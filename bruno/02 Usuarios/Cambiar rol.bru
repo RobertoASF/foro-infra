@@ -1,0 +1,28 @@
+meta {
+  name: Cambiar rol
+  type: http
+  seq: 11
+}
+
+put {
+  url: {{usuarios}}/api/usuarios/{{idNuevo}}/rol
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+body:json {
+  {
+    "rol": "MODERADOR"
+  }
+}
+
+tests {
+  test("cambia el rol del usuario", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.rol).to.equal("MODERADOR");
+  });
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Publicar sin token
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{publicaciones}}/api/temas
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "titulo": "Sin sesion",
+    "contenido": "No deberia guardarse.",
+    "categoriaId": {{idCategoria}}
+  }
+}
+
+tests {
+  test("responde 401", function () {
+    expect(res.status).to.equal(401);
+  });
+}
