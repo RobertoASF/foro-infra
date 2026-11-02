@@ -1,0 +1,31 @@
+meta {
+  name: Editar tema como autor
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{publicaciones}}/api/temas/{{idTema}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenCamila}}
+}
+
+body:json {
+  {
+    "titulo": "Tema editado desde Bruno",
+    "contenido": "Contenido actualizado.",
+    "categoriaId": {{idCategoria}}
+  }
+}
+
+tests {
+  test("guarda los cambios y marca la fecha de edicion", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.titulo).to.equal("Tema editado desde Bruno");
+    expect(res.body.fechaActualizacion).to.not.equal(null);
+  });
+}

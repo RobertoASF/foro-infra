@@ -1,0 +1,25 @@
+meta {
+  name: Login con clave incorrecta
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{usuarios}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombreUsuario": "camila",
+    "password": "clave-incorrecta"
+  }
+}
+
+tests {
+  test("rechaza el ingreso con 401", function () {
+    expect(res.status).to.equal(401);
+    expect(res.body.mensaje).to.equal("Usuario o clave incorrectos");
+  });
+}

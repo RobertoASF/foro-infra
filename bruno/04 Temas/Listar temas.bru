@@ -1,0 +1,24 @@
+meta {
+  name: Listar temas
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{publicaciones}}/api/temas?pagina=0&tamano=3
+  body: none
+  auth: none
+}
+
+params:query {
+  pagina: 0
+  tamano: 3
+}
+
+tests {
+  test("devuelve una pagina de temas sin pedir token", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.contenido.length).to.equal(3);
+    expect(res.body.totalElementos).to.be.at.least(6);
+  });
+}

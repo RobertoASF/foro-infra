@@ -1,0 +1,21 @@
+meta {
+  name: Eliminar categoria con temas
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{publicaciones}}/api/categorias/{{idCategoria}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+tests {
+  test("responde 409 porque aun tiene temas", function () {
+    expect(res.status).to.equal(409);
+  });
+}

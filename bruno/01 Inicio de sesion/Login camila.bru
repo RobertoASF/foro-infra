@@ -1,0 +1,30 @@
+meta {
+  name: Login camila
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{usuarios}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombreUsuario": "camila",
+    "password": "{{clave}}"
+  }
+}
+
+vars:post-response {
+  tokenCamila: res.body.token
+  idCamila: res.body.usuario.id
+}
+
+tests {
+  test("entrega un token con rol USUARIO", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.usuario.rol).to.equal("USUARIO");
+  });
+}

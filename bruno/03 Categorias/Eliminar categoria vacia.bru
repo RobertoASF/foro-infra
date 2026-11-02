@@ -1,0 +1,22 @@
+meta {
+  name: Eliminar categoria vacia
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{publicaciones}}/api/categorias/{{idCategoriaNueva}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+tests {
+  test("elimina la categoria", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.mensaje).to.equal("Categoría eliminada");
+  });
+}

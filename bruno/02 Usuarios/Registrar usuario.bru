@@ -1,0 +1,36 @@
+meta {
+  name: Registrar usuario
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{usuarios}}/api/usuarios
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombreUsuario": "{{nombreNuevo}}",
+    "email": "{{nombreNuevo}}@foro.cl",
+    "password": "ClaveNueva2026*"
+  }
+}
+
+script:pre-request {
+  bru.setVar("nombreNuevo", "usuario" + Date.now());
+}
+
+vars:post-response {
+  idNuevo: res.body.id
+}
+
+tests {
+  test("crea el usuario con rol USUARIO y sin exponer la clave", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.rol).to.equal("USUARIO");
+    expect(res.body).to.not.have.property("password");
+    expect(res.body).to.not.have.property("passwordHash");
+  });
+}

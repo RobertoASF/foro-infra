@@ -1,0 +1,23 @@
+meta {
+  name: Buscar por texto
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{publicaciones}}/api/temas/buscar?texto=JAVA
+  body: none
+  auth: none
+}
+
+params:query {
+  texto: JAVA
+}
+
+tests {
+  test("encuentra el texto sin importar mayusculas", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.totalElementos).to.be.at.least(1);
+    expect(res.body.contenido[0].titulo).to.contain("lenguaje");
+  });
+}

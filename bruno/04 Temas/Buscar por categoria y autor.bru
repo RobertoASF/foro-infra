@@ -1,0 +1,27 @@
+meta {
+  name: Buscar por categoria y autor
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{publicaciones}}/api/temas/buscar?categoriaId=3&autorId=3
+  body: none
+  auth: none
+}
+
+params:query {
+  categoriaId: 3
+  autorId: 3
+}
+
+tests {
+  test("aplica los dos filtros a la vez", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.totalElementos).to.be.at.least(1);
+    res.body.contenido.forEach((tema) => {
+      expect(tema.categoria.id).to.equal(3);
+      expect(tema.autorId).to.equal(3);
+    });
+  });
+}

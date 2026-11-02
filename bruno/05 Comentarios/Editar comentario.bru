@@ -1,0 +1,29 @@
+meta {
+  name: Editar comentario
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{publicaciones}}/api/comentarios/{{idComentario}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenCamila}}
+}
+
+body:json {
+  {
+    "contenido": "Comentario editado."
+  }
+}
+
+tests {
+  test("guarda el cambio y marca la fecha de edicion", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.contenido).to.equal("Comentario editado.");
+    expect(res.body.fechaActualizacion).to.not.equal(null);
+  });
+}

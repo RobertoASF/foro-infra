@@ -1,0 +1,18 @@
+meta {
+  name: Listar usuarios sin token
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{usuarios}}/api/usuarios
+  body: none
+  auth: none
+}
+
+tests {
+  test("responde 401 en json", function () {
+    expect(res.status).to.equal(401);
+    expect(res.body.estado).to.equal(401);
+  });
+}

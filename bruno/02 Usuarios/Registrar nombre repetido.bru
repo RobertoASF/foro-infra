@@ -1,0 +1,25 @@
+meta {
+  name: Registrar nombre repetido
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{usuarios}}/api/usuarios
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombreUsuario": "camila",
+    "email": "otra.camila@foro.cl",
+    "password": "ClaveNueva2026*"
+  }
+}
+
+tests {
+  test("responde 409", function () {
+    expect(res.status).to.equal(409);
+  });
+}

@@ -1,0 +1,35 @@
+meta {
+  name: Publicar tema
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{publicaciones}}/api/temas
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenCamila}}
+}
+
+body:json {
+  {
+    "titulo": "Tema publicado desde Bruno",
+    "contenido": "Este tema se crea en la prueba de la colección.",
+    "categoriaId": {{idCategoria}}
+  }
+}
+
+vars:post-response {
+  idTema: res.body.id
+}
+
+tests {
+  test("guarda el autor que viene en el token", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.autorNombre).to.equal("camila");
+    expect(res.body.totalComentarios).to.equal(0);
+  });
+}

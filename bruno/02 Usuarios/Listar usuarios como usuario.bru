@@ -1,0 +1,21 @@
+meta {
+  name: Listar usuarios como usuario
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{usuarios}}/api/usuarios
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenCamila}}
+}
+
+tests {
+  test("responde 403 porque no es admin", function () {
+    expect(res.status).to.equal(403);
+  });
+}

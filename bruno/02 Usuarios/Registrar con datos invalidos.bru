@@ -1,0 +1,28 @@
+meta {
+  name: Registrar con datos invalidos
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{usuarios}}/api/usuarios
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombreUsuario": "a",
+    "email": "no-es-un-email",
+    "password": "123"
+  }
+}
+
+tests {
+  test("responde 400 e indica cada campo", function () {
+    expect(res.status).to.equal(400);
+    expect(res.body.detalles).to.have.property("nombreUsuario");
+    expect(res.body.detalles).to.have.property("email");
+    expect(res.body.detalles).to.have.property("password");
+  });
+}

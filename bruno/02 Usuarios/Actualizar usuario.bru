@@ -1,0 +1,28 @@
+meta {
+  name: Actualizar usuario
+  type: http
+  seq: 10
+}
+
+put {
+  url: {{usuarios}}/api/usuarios/{{idNuevo}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+body:json {
+  {
+    "email": "{{nombreNuevo}}.editado@foro.cl"
+  }
+}
+
+tests {
+  test("guarda el nuevo email", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.email).to.contain(".editado@foro.cl");
+  });
+}

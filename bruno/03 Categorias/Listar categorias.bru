@@ -1,0 +1,22 @@
+meta {
+  name: Listar categorias
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{publicaciones}}/api/categorias
+  body: none
+  auth: none
+}
+
+vars:post-response {
+  idCategoria: res.body[0].id
+}
+
+tests {
+  test("hay al menos cinco categorias y no pide token", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.length).to.be.at.least(5);
+  });
+}
