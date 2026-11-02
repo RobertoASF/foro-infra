@@ -1,6 +1,8 @@
-# Foro en línea: infraestructura
+# Foro de TCG: infraestructura
 
-Este repositorio levanta el backend completo del foro con un solo comando. Aquí están el `docker-compose`, la carga inicial de Oracle y la colección de Bruno con las pruebas de todos los endpoints.
+Foro en línea para jugadores de cinco juegos de cartas coleccionables: Magic The Gathering, Mitos y Leyendas, Pokemon TCG, One Piece TCG y Yu-Gi-Oh!
+
+Este repositorio levanta el backend completo con un solo comando. Aquí están el `docker-compose`, la carga inicial de Oracle Cloud y la colección de Bruno con las pruebas de todos los endpoints.
 
 El sistema se divide en tres repositorios:
 
@@ -17,15 +19,16 @@ flowchart LR
     C[Cliente: Bruno o un frontend] -->|1. login| U[ms-usuarios :8081]
     U -->|2. token JWT| C
     C -->|3. peticiones con token| P[ms-publicaciones :8082]
-    subgraph Oracle [Oracle FREEPDB1]
+    subgraph Oracle [Oracle Autonomous Database 26ai]
         EU[(FORO_USUARIOS)]
         EP[(FORO_PUBLICACIONES)]
     end
-    U --> EU
-    P --> EP
+    U -->|Wallet| EU
+    P -->|Wallet| EP
 ```
 
 - Cada microservicio es dueño de sus datos y tiene su propio esquema en Oracle.
+- Los microservicios se conectan a Oracle Cloud con el Wallet, que se monta como solo lectura y nunca se sube a git.
 - `ms-usuarios` entrega un token JWT firmado con el id, el nombre y el rol del usuario.
 - `ms-publicaciones` valida ese token con el mismo secreto, así que no necesita llamar a `ms-usuarios`. Si uno de los dos se detiene, el otro sigue funcionando.
 - Cada tema y comentario guarda el id y el nombre de su autor. Ese id no lleva clave foránea porque el usuario vive en otro esquema.
@@ -92,46 +95,46 @@ erDiagram
 
 ## Cómo levantarlo
 
-Necesitas Docker Desktop y los tres repositorios en la misma carpeta:
+Necesitas Docker Desktop, una Autonomous Database en Oracle Cloud y su Wallet descomprimido. Los tres repositorios van en la misma carpeta:
 
 ```
 carpeta/
 ├── foro-infra/
+│   └── Wallet_dbfullstack3/
 ├── foro-ms-usuarios/
 └── foro-ms-publicaciones/
 ```
 
-Dentro de `foro-infra`, copia el archivo de variables y cambia sus valores:
+Dentro de `foro-infra`, copia el archivo de variables y completa sus valores:
 
 ```bash
 cp .env.example .env
 ```
 
-Luego levanta todo:
+La primera vez, crea los esquemas y carga los datos iniciales. Este paso se hace una sola vez y después ya no se necesita la clave de ADMIN:
+
+```bash
+docker compose run --rm cargar-bd
+```
+
+Luego levanta los microservicios:
 
 ```bash
 docker compose up -d --build --wait
 ```
 
-La primera vez demora unos minutos porque descarga las imágenes y compila los microservicios. Oracle crea los esquemas, las tablas y los datos iniciales solo en ese primer arranque.
-
 | Servicio | Dirección |
 |---|---|
 | ms-usuarios | http://localhost:8081 |
 | ms-publicaciones | http://localhost:8082 |
-| Oracle | `localhost:1521`, servicio `FREEPDB1` |
 
-Para detenerlo sin perder los datos:
+Para detenerlos:
 
 ```bash
 docker compose down
 ```
 
-Para borrar también la base y partir desde cero:
-
-```bash
-docker compose down -v
-```
+Los datos quedan guardados en Oracle Cloud. Una base Always Free se detiene tras 7 días sin uso, así que si los servicios no parten, revisa que esté encendida en la consola de Oracle Cloud.
 
 ## Usuarios de prueba
 
@@ -160,16 +163,11 @@ npx @usebruno/cli@4.3.0 run -r --env local
 
 ## Revisar los datos en Oracle
 
-Con cualquier cliente SQL, usa los datos de conexión de arriba con el usuario `foro_usuarios` o `foro_publicaciones` y la clave definida en `.env`.
-
-También se puede entrar desde el contenedor:
-
-```bash
-docker exec -it foro-oracle sqlplus foro_publicaciones@//localhost/FREEPDB1
-```
+En la consola de Oracle Cloud, abre la base y entra a **Database Actions > SQL** con el usuario ADMIN:
 
 ```sql
 SELECT t.id, t.titulo, c.nombre AS categoria, t.autor_nombre
-FROM temas t JOIN categorias c ON c.id = t.categoria_id
+FROM foro_publicaciones.temas t
+JOIN foro_publicaciones.categorias c ON c.id = t.categoria_id
 ORDER BY t.id;
 ```
