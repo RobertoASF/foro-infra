@@ -1,3 +1,5 @@
 .env
+Wallet_*/
+Wallet_*.zip
 *.log
 node_modules/

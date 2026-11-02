@@ -1,41 +1,19 @@
 name: foro
 
 services:
-  oracle:
-    image: gvenzl/oracle-free:23-slim-faststart
-    container_name: foro-oracle
-    environment:
-      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
-      DB_USUARIOS_PASSWORD: ${DB_USUARIOS_PASSWORD}
-      DB_PUBLICACIONES_PASSWORD: ${DB_PUBLICACIONES_PASSWORD}
-    ports:
-      - "127.0.0.1:1521:1521"
-    volumes:
-      - oracle-datos:/opt/oracle/oradata
-      - ./db/00_iniciar_bd.sh:/container-entrypoint-initdb.d/00_iniciar_bd.sh:ro
-      - ../foro-ms-usuarios/db:/sql/usuarios:ro
-      - ../foro-ms-publicaciones/db:/sql/publicaciones:ro
-    healthcheck:
-      test: ["CMD", "healthcheck.sh"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      start_period: 30s
-
   ms-usuarios:
     build: ../foro-ms-usuarios
     container_name: foro-ms-usuarios
-    depends_on:
-      oracle:
-        condition: service_healthy
     environment:
-      DB_URL: jdbc:oracle:thin:@//oracle:1521/FREEPDB1
+      DB_URL: jdbc:oracle:thin:@${DB_ALIAS}?TNS_ADMIN=/wallet
       DB_USUARIO: foro_usuarios
       DB_PASSWORD: ${DB_USUARIOS_PASSWORD}
       JWT_SECRETO: ${JWT_SECRETO}
       CORS_ORIGEN: ${CORS_ORIGEN}
       LOG_NIVEL: DEBUG
       TZ: America/Santiago
+    volumes:
+      - ./${WALLET_DIR}:/wallet:ro
     ports:
       - "8081:8081"
     healthcheck:
@@ -43,22 +21,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 12
-      start_period: 20s
+      start_period: 30s
 
   ms-publicaciones:
     build: ../foro-ms-publicaciones
     container_name: foro-ms-publicaciones
-    depends_on:
-      oracle:
-        condition: service_healthy
     environment:
-      DB_URL: jdbc:oracle:thin:@//oracle:1521/FREEPDB1
+      DB_URL: jdbc:oracle:thin:@${DB_ALIAS}?TNS_ADMIN=/wallet
       DB_USUARIO: foro_publicaciones
       DB_PASSWORD: ${DB_PUBLICACIONES_PASSWORD}
       JWT_SECRETO: ${JWT_SECRETO}
       CORS_ORIGEN: ${CORS_ORIGEN}
       LOG_NIVEL: DEBUG
       TZ: America/Santiago
+    volumes:
+      - ./${WALLET_DIR}:/wallet:ro
     ports:
       - "8082:8082"
     healthcheck:
@@ -66,7 +43,20 @@ services:
       interval: 10s
       timeout: 5s
       retries: 12
-      start_period: 20s
+      start_period: 30s
 
-volumes:
-  oracle-datos:
+  # Tarea de una sola vez. Esta imagen se usa solo porque trae SQL*Plus.
+  cargar-bd:
+    image: gvenzl/oracle-free:23-slim-faststart
+    profiles: ["carga"]
+    entrypoint: ["bash", "/scripts/cargar_bd.sh"]
+    environment:
+      DB_ALIAS: ${DB_ALIAS}
+      ORACLE_ADMIN_PASSWORD: ${ORACLE_ADMIN_PASSWORD}
+      DB_USUARIOS_PASSWORD: ${DB_USUARIOS_PASSWORD}
+      DB_PUBLICACIONES_PASSWORD: ${DB_PUBLICACIONES_PASSWORD}
+    volumes:
+      - ./${WALLET_DIR}:/wallet:ro
+      - ./db:/scripts:ro
+      - ../foro-ms-usuarios/db:/sql/usuarios:ro
+      - ../foro-ms-publicaciones/db:/sql/publicaciones:ro
