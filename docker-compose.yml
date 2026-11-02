@@ -5,15 +5,13 @@ services:
     build: ../foro-ms-usuarios
     container_name: foro-ms-usuarios
     environment:
-      DB_URL: jdbc:oracle:thin:@${DB_ALIAS}?TNS_ADMIN=/wallet
-      DB_USUARIO: foro_usuarios
       DB_PASSWORD: ${DB_USUARIOS_PASSWORD}
       JWT_SECRETO: ${JWT_SECRETO}
       CORS_ORIGEN: ${CORS_ORIGEN}
       LOG_NIVEL: DEBUG
       TZ: America/Santiago
     volumes:
-      - ${WALLET_DIR}:/wallet:ro
+      - ${WALLET_DIR}:/Wallet_dbfullstack3:ro
     ports:
       - "8081:8081"
     healthcheck:
@@ -27,15 +25,13 @@ services:
     build: ../foro-ms-publicaciones
     container_name: foro-ms-publicaciones
     environment:
-      DB_URL: jdbc:oracle:thin:@${DB_ALIAS}?TNS_ADMIN=/wallet
-      DB_USUARIO: foro_publicaciones
       DB_PASSWORD: ${DB_PUBLICACIONES_PASSWORD}
       JWT_SECRETO: ${JWT_SECRETO}
       CORS_ORIGEN: ${CORS_ORIGEN}
       LOG_NIVEL: DEBUG
       TZ: America/Santiago
     volumes:
-      - ${WALLET_DIR}:/wallet:ro
+      - ${WALLET_DIR}:/Wallet_dbfullstack3:ro
     ports:
       - "8082:8082"
     healthcheck:
