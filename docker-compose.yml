@@ -22,5 +22,51 @@ services:
       retries: 30
       start_period: 30s
 
+  ms-usuarios:
+    build: ../foro-ms-usuarios
+    container_name: foro-ms-usuarios
+    depends_on:
+      oracle:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:oracle:thin:@//oracle:1521/FREEPDB1
+      DB_USUARIO: foro_usuarios
+      DB_PASSWORD: ${DB_USUARIOS_PASSWORD}
+      JWT_SECRETO: ${JWT_SECRETO}
+      CORS_ORIGEN: ${CORS_ORIGEN}
+      LOG_NIVEL: DEBUG
+      TZ: America/Santiago
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  ms-publicaciones:
+    build: ../foro-ms-publicaciones
+    container_name: foro-ms-publicaciones
+    depends_on:
+      oracle:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:oracle:thin:@//oracle:1521/FREEPDB1
+      DB_USUARIO: foro_publicaciones
+      DB_PASSWORD: ${DB_PUBLICACIONES_PASSWORD}
+      JWT_SECRETO: ${JWT_SECRETO}
+      CORS_ORIGEN: ${CORS_ORIGEN}
+      LOG_NIVEL: DEBUG
+      TZ: America/Santiago
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
 volumes:
   oracle-datos:
