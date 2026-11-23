@@ -11,10 +11,13 @@ sed -i 's|?/network/admin|/tmp/wallet|' /tmp/wallet/sqlnet.ora
 export TNS_ADMIN=/tmp/wallet
 
 # La clave va dentro de SQL*Plus para que no quede a la vista en la lista de procesos
+# DEFINE se apaga al conectar para que un & en la clave no se lea como variable
 ejecutar() {
   sqlplus -s /nolog <<EOF
 WHENEVER SQLERROR EXIT FAILURE
+SET DEFINE OFF
 CONNECT $1/"$2"@$DB_ALIAS
+SET DEFINE ON
 $3
 EXIT
 EOF
@@ -24,6 +27,7 @@ EOF
 consultar() {
   sqlplus -s /nolog <<EOF | tr -d '[:space:]'
 WHENEVER SQLERROR EXIT FAILURE
+SET DEFINE OFF
 CONNECT $1/"$2"@$DB_ALIAS
 SET HEADING OFF FEEDBACK OFF PAGESIZE 0 VERIFY OFF
 $3
