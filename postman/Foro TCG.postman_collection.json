@@ -1,0 +1,3449 @@
+{
+  "info": {
+    "_postman_id": "28e97d04-f429-5214-bd53-cc0e18b82a5a",
+    "name": "Foro TCG",
+    "description": "Pruebas de ms-usuarios, ms-publicaciones y ms-moderacion. Ejecuta la colección completa en orden: las primeras peticiones guardan los tokens que usan las demás.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 Estado de los servicios",
+      "item": [
+        {
+          "name": "Salud de usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el servicio responde UP\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.status).to.equal(\"UP\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{usuarios}}/actuator/health",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Salud de publicaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el servicio responde UP\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.status).to.equal(\"UP\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/actuator/health",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Salud de moderacion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el servicio responde UP\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.status).to.equal(\"UP\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{moderacion}}/actuator/health",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 Inicio de sesion",
+      "item": [
+        {
+          "name": "Login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"entrega un token con rol ADMIN\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.tipo).to.equal(\"Bearer\");",
+                  "  pm.expect(body.usuario.rol).to.equal(\"ADMIN\");",
+                  "});",
+                  "pm.collectionVariables.set(\"tokenAdmin\", body.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"admin\",\n  \"password\": \"{{clave}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login moderador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"entrega un token con rol MODERADOR\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.usuario.rol).to.equal(\"MODERADOR\");",
+                  "});",
+                  "pm.collectionVariables.set(\"tokenModerador\", body.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"moderador\",\n  \"password\": \"{{clave}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login camila",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"entrega un token con rol USUARIO\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.usuario.rol).to.equal(\"USUARIO\");",
+                  "});",
+                  "pm.collectionVariables.set(\"tokenCamila\", body.token);",
+                  "pm.collectionVariables.set(\"idCamila\", body.usuario.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"camila\",\n  \"password\": \"{{clave}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login con clave incorrecta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"rechaza el ingreso con 401\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(401);",
+                  "  pm.expect(body.mensaje).to.equal(\"Usuario o clave incorrectos\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"camila\",\n  \"password\": \"clave-incorrecta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login diego",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"entrega un token con rol USUARIO\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.usuario.rol).to.equal(\"USUARIO\");",
+                  "});",
+                  "pm.collectionVariables.set(\"tokenDiego\", body.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"diego\",\n  \"password\": \"{{clave}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Usuarios",
+      "item": [
+        {
+          "name": "Registrar usuario",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"nombreNuevo\", \"usuario\" + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"crea el usuario con rol USUARIO y sin exponer la clave\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "  pm.expect(body.rol).to.equal(\"USUARIO\");",
+                  "  pm.expect(body).to.not.have.property(\"password\");",
+                  "  pm.expect(body).to.not.have.property(\"passwordHash\");",
+                  "});",
+                  "pm.collectionVariables.set(\"idNuevo\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/usuarios",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"{{nombreNuevo}}\",\n  \"email\": \"{{nombreNuevo}}@foro.cl\",\n  \"password\": \"ClaveNueva2026*\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registrar con datos invalidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 400 e indica cada campo\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(400);",
+                  "  pm.expect(body.detalles).to.have.property(\"nombreUsuario\");",
+                  "  pm.expect(body.detalles).to.have.property(\"email\");",
+                  "  pm.expect(body.detalles).to.have.property(\"password\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/usuarios",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"a\",\n  \"email\": \"no-es-un-email\",\n  \"password\": \"123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registrar nombre repetido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 409\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(409);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/usuarios",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"camila\",\n  \"email\": \"otra.camila@foro.cl\",\n  \"password\": \"ClaveNueva2026*\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar usuarios como admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"devuelve al menos los usuarios iniciales\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.length).to.be.at.least(4);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{usuarios}}/api/usuarios",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filtrar usuarios por rol",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"devuelve solo moderadores\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.length).to.be.at.least(1);",
+                  "  body.forEach((usuario) => pm.expect(usuario.rol).to.equal(\"MODERADOR\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{usuarios}}/api/usuarios?rol=moderador",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar usuarios sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 401 en json\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(401);",
+                  "  pm.expect(body.estado).to.equal(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{usuarios}}/api/usuarios",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Listar usuarios como usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 403 porque no es admin\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{usuarios}}/api/usuarios",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ver mi cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"cada usuario puede ver su propia cuenta\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.nombreUsuario).to.equal(\"camila\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{usuarios}}/api/usuarios/{{idCamila}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ver cuenta ajena",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 403 con una cuenta de otra persona\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{usuarios}}/api/usuarios/1",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"guarda el nuevo email\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.email).to.contain(\".editado@foro.cl\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/usuarios/{{idNuevo}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{nombreNuevo}}.editado@foro.cl\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cambiar rol",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"cambia el rol del usuario\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.rol).to.equal(\"MODERADOR\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/usuarios/{{idNuevo}}/rol",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rol\": \"MODERADOR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Desactivar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"deja la cuenta inactiva\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.activo).to.equal(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/usuarios/{{idNuevo}}/estado",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login de usuario inactivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"una cuenta inactiva no puede entrar\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{usuarios}}/api/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreUsuario\": \"{{nombreNuevo}}\",\n  \"password\": \"ClaveNueva2026*\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar roles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"muestra los tres roles con su total de usuarios\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.length).to.equal(3);",
+                  "  pm.expect(body[0]).to.have.property(\"totalUsuarios\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{usuarios}}/api/roles",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"elimina la cuenta y responde en json\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.mensaje).to.equal(\"Usuario eliminado\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{usuarios}}/api/usuarios/{{idNuevo}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ver usuario eliminado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 404\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{usuarios}}/api/usuarios/{{idNuevo}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Categorias",
+      "item": [
+        {
+          "name": "Listar categorias",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"hay al menos cinco categorias y no pide token\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.length).to.be.at.least(5);",
+                  "});",
+                  "pm.collectionVariables.set(\"idCategoria\", body[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/categorias",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Resumen por categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"cuenta temas y comentarios de cada categoria\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body[0]).to.have.property(\"totalTemas\");",
+                  "  pm.expect(body[0]).to.have.property(\"totalComentarios\");",
+                  "  pm.expect(body[0]).to.have.property(\"ultimoTema\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/categorias/resumen",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Crear categoria como admin",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"nombreCategoria\", \"Digimon TCG \" + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"crea la categoria\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "  pm.expect(body.id).to.be.a(\"number\");",
+                  "});",
+                  "pm.collectionVariables.set(\"idCategoriaNueva\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/categorias",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"{{nombreCategoria}}\",\n  \"descripcion\": \"Categoría creada desde Bruno\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear categoria como moderador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 403\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/categorias",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"No deberia crearse\",\n  \"descripcion\": \"Solo el admin gestiona categorías\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Actualizar categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"guarda la nueva descripcion\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.descripcion).to.equal(\"Descripción actualizada\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/categorias/{{idCategoriaNueva}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"{{nombreCategoria}}\",\n  \"descripcion\": \"Descripción actualizada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar categoria con temas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 409 porque aun tiene temas\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(409);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{publicaciones}}/api/categorias/{{idCategoria}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar categoria vacia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"elimina la categoria\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.mensaje).to.equal(\"Categoría eliminada\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{publicaciones}}/api/categorias/{{idCategoriaNueva}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Temas",
+      "item": [
+        {
+          "name": "Listar temas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"devuelve una pagina de temas sin pedir token\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.contenido.length).to.equal(3);",
+                  "  pm.expect(body.totalElementos).to.be.at.least(6);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas?pagina=0&tamano=3",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Buscar por texto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"encuentra el texto sin importar mayusculas\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.totalElementos).to.be.at.least(1);",
+                  "  pm.expect(body.contenido[0].titulo).to.contain(\"Commander\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/buscar?texto=COMMANDER",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Buscar por categoria y autor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"aplica los dos filtros a la vez\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.totalElementos).to.be.at.least(1);",
+                  "  body.contenido.forEach((tema) => {",
+                  "    pm.expect(tema.categoria.id).to.equal(3);",
+                  "    pm.expect(tema.autorId).to.equal(3);",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/buscar?categoriaId=3&autorId=3",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Publicar tema",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"guarda el autor que viene en el token\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "  pm.expect(body.autorNombre).to.equal(\"camila\");",
+                  "  pm.expect(body.totalComentarios).to.equal(0);",
+                  "});",
+                  "pm.collectionVariables.set(\"idTema\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/temas",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Tema publicado desde Bruno\",\n  \"contenido\": \"Este tema se crea en la prueba de la colección.\",\n  \"categoriaId\": {{idCategoria}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Publicar sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 401\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/temas",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Sin sesion\",\n  \"contenido\": \"No deberia guardarse.\",\n  \"categoriaId\": {{idCategoria}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Publicar con categoria inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 404\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/temas",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Categoria que no existe\",\n  \"contenido\": \"No deberia guardarse.\",\n  \"categoriaId\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Editar tema como autor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"guarda los cambios y marca la fecha de edicion\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.titulo).to.equal(\"Tema editado desde Bruno\");",
+                  "  pm.expect(body.fechaActualizacion).to.not.equal(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/temas/{{idTema}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Tema editado desde Bruno\",\n  \"contenido\": \"Contenido actualizado.\",\n  \"categoriaId\": {{idCategoria}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Editar tema ajeno",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 403 aunque sea moderador\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/temas/{{idTema}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Intento de edicion\",\n  \"contenido\": \"Solo el autor puede editar.\",\n  \"categoriaId\": {{idCategoria}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Comentarios",
+      "item": [
+        {
+          "name": "Comentar tema",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"crea el comentario\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "  pm.expect(body.autorNombre).to.equal(\"camila\");",
+                  "});",
+                  "pm.collectionVariables.set(\"idComentario\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/temas/{{idTema}}/comentarios",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"Primer comentario desde Bruno.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Comentar vacio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 400 e indica el campo\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(400);",
+                  "  pm.expect(body.detalles).to.have.property(\"contenido\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/temas/{{idTema}}/comentarios",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"   \"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar comentarios del tema",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"muestra el comentario publicado\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.length).to.equal(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/{{idTema}}/comentarios",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Ver tema con comentarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"trae el tema junto a sus comentarios\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.tema.totalComentarios).to.equal(1);",
+                  "  pm.expect(body.comentarios.length).to.equal(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/{{idTema}}",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Editar comentario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"guarda el cambio y marca la fecha de edicion\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.contenido).to.equal(\"Comentario editado.\");",
+                  "  pm.expect(body.fechaActualizacion).to.not.equal(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/comentarios/{{idComentario}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"Comentario editado.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Moderador borra comentario ajeno",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el moderador puede borrarlo\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.mensaje).to.equal(\"Comentario eliminado\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{publicaciones}}/api/comentarios/{{idComentario}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Moderador borra tema ajeno",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el moderador puede borrarlo\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.mensaje).to.equal(\"Tema eliminado\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/{{idTema}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ver tema eliminado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"responde 404\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/{{idTema}}",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Moderacion",
+      "item": [
+        {
+          "name": "Listar normas sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"las normas son publicas\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.length).to.be.at.least(5);",
+                  "});",
+                  "pm.collectionVariables.set(\"idNormaSpam\", body.find((n) => n.titulo === \"Sin spam ni publicidad\").id);",
+                  "pm.collectionVariables.set(\"idNormaRespeto\", body.find((n) => n.titulo === \"Respeto entre jugadores\").id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{moderacion}}/api/normas",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Crear norma como admin",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"sufijo\", Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el admin crea la norma\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "  pm.expect(body.titulo).to.include(\"Norma de prueba\");",
+                  "});",
+                  "pm.collectionVariables.set(\"idNormaNueva\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/normas",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Norma de prueba {{sufijo}}\",\n  \"descripcion\": \"Norma creada desde la colección de Postman.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear norma como moderador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"solo el admin gestiona normas\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/normas",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Norma no permitida\",\n  \"descripcion\": \"Un moderador no puede crear normas.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear norma con datos invalidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"indica cada campo con error\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(400);",
+                  "  pm.expect(body.detalles).to.have.property(\"titulo\");",
+                  "  pm.expect(body.detalles).to.have.property(\"descripcion\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/normas",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"ab\",\n  \"descripcion\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Actualizar norma",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"actualiza la norma\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.titulo).to.include(\"Norma editada\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/normas/{{idNormaNueva}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Norma editada {{sufijo}}\",\n  \"descripcion\": \"Descripción actualizada desde Postman.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar norma sin uso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"elimina la norma\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.mensaje).to.equal(\"Norma eliminada\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{moderacion}}/api/normas/{{idNormaNueva}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Camila publica un tema para moderar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"publica el tema\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.collectionVariables.set(\"idTemaModeracion\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/temas",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Tema de prueba para moderación\",\n  \"contenido\": \"Este tema se crea desde Postman para probar reportes y baneos.\",\n  \"categoriaId\": {{idCategoria}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Camila comenta su tema",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"publica el comentario\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.collectionVariables.set(\"idComentarioModeracion\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{publicaciones}}/api/temas/{{idTemaModeracion}}/comentarios",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contenido\": \"Comentario de prueba para moderación.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Reportar sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"pide iniciar sesion\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/reportes",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"TEMA\",\n  \"contenidoId\": {{idTemaModeracion}},\n  \"normaId\": {{idNormaSpam}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Diego reporta el tema",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el reporte queda pendiente\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "  pm.expect(body.estado).to.equal(\"PENDIENTE\");",
+                  "  pm.expect(body.reportadoPorNombre).to.equal(\"diego\");",
+                  "});",
+                  "pm.collectionVariables.set(\"idReporte\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/reportes",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenDiego}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"TEMA\",\n  \"contenidoId\": {{idTemaModeracion}},\n  \"normaId\": {{idNormaSpam}},\n  \"detalle\": \"Parece publicidad.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Reportar el mismo tema otra vez",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"no deja reportar dos veces lo mismo\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(409);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/reportes",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenDiego}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"TEMA\",\n  \"contenidoId\": {{idTemaModeracion}},\n  \"normaId\": {{idNormaSpam}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Reportar comentario inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"revisa en ms-publicaciones que el comentario exista\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(404);",
+                  "  pm.expect(body.mensaje).to.equal(\"No existe el comentario con id 999999\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/reportes",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenDiego}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"COMENTARIO\",\n  \"contenidoId\": 999999,\n  \"normaId\": {{idNormaRespeto}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Reportar con tipo invalido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"rechaza tipos que no existen\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/reportes",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenDiego}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"FOTO\",\n  \"contenidoId\": 1,\n  \"normaId\": {{idNormaRespeto}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Mis reportes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"diego ve sus reportes\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.map((r) => r.id)).to.include(pm.collectionVariables.get(\"idReporte\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{moderacion}}/api/reportes/mios",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenDiego}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar reportes como usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"un usuario comun no revisa reportes\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{moderacion}}/api/reportes?estado=PENDIENTE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar reportes pendientes como moderador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el reporte aparece pendiente\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.map((r) => r.id)).to.include(pm.collectionVariables.get(\"idReporte\"));",
+                  "  body.forEach((r) => pm.expect(r.estado).to.equal(\"PENDIENTE\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{moderacion}}/api/reportes?estado=PENDIENTE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Banear sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"pide iniciar sesion\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/baneos",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"TEMA\",\n  \"contenidoId\": {{idTemaModeracion}},\n  \"normaId\": {{idNormaSpam}},\n  \"motivo\": \"Publicidad fuera de lugar\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Banear como usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"un usuario no puede banear\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/baneos",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"TEMA\",\n  \"contenidoId\": {{idTemaModeracion}},\n  \"normaId\": {{idNormaSpam}},\n  \"motivo\": \"Publicidad fuera de lugar\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Banear con motivo corto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el motivo tiene minimo 10 caracteres\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(400);",
+                  "  pm.expect(body.detalles).to.have.property(\"motivo\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/baneos",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"TEMA\",\n  \"contenidoId\": {{idTemaModeracion}},\n  \"normaId\": {{idNormaSpam}},\n  \"motivo\": \"spam\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Banear tema inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"ms-publicaciones responde que no existe\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(404);",
+                  "  pm.expect(body.mensaje).to.equal(\"No existe el tema con id 999999\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/baneos",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"TEMA\",\n  \"contenidoId\": 999999,\n  \"normaId\": {{idNormaSpam}},\n  \"motivo\": \"Tema que no existe en el foro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Moderador banea el tema reportado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el baneo queda activo\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "  pm.expect(body.activo).to.equal(true);",
+                  "  pm.expect(body.moderadorNombre).to.equal(\"moderador\");",
+                  "});",
+                  "pm.collectionVariables.set(\"idBaneo\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/baneos",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"TEMA\",\n  \"contenidoId\": {{idTemaModeracion}},\n  \"normaId\": {{idNormaSpam}},\n  \"motivo\": \"Publicidad que no tiene relación con el foro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "El tema baneado ya no se ve",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"ms-publicaciones lo oculta\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/{{idTemaModeracion}}",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "El tema baneado no sale en la busqueda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"no aparece en los resultados\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.contenido.map((t) => t.id)).to.not.include(pm.collectionVariables.get(\"idTemaModeracion\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/buscar?texto=moderación&tamano=50",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "El reporte quedo aceptado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el reporte paso a ACEPTADO\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  const reporte = body.find((r) => r.id === pm.collectionVariables.get(\"idReporte\"));",
+                  "  pm.expect(reporte.revisadoPorNombre).to.equal(\"moderador\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{moderacion}}/api/reportes?estado=ACEPTADO",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Banear el mismo tema otra vez",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"no se banea dos veces\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(409);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/baneos",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"TEMA\",\n  \"contenidoId\": {{idTemaModeracion}},\n  \"normaId\": {{idNormaSpam}},\n  \"motivo\": \"Publicidad que no tiene relación con el foro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Resumen de moderacion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"cuenta reportes y baneos\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.baneosActivos).to.be.at.least(1);",
+                  "  pm.expect(body).to.have.property(\"reportesPendientes\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{moderacion}}/api/baneos/resumen",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "El moderador no puede levantar el baneo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"solo el admin levanta baneos\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(403);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{moderacion}}/api/baneos/{{idBaneo}}/levantar",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "El admin levanta el baneo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el baneo queda inactivo\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.activo).to.equal(false);",
+                  "  pm.expect(body.levantadoPorNombre).to.equal(\"admin\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{moderacion}}/api/baneos/{{idBaneo}}/levantar",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Levantar el baneo otra vez",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"ya estaba levantado\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(409);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{moderacion}}/api/baneos/{{idBaneo}}/levantar",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "El tema vuelve a verse",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el tema vuelve al foro\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/{{idTemaModeracion}}",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Diego reporta el comentario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"crea el reporte del comentario\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.collectionVariables.set(\"idReporteComentario\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/reportes",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenDiego}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"COMENTARIO\",\n  \"contenidoId\": {{idComentarioModeracion}},\n  \"normaId\": {{idNormaRespeto}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Moderador descarta el reporte",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"el reporte queda descartado\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.estado).to.equal(\"DESCARTADO\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{moderacion}}/api/reportes/{{idReporteComentario}}/descartar",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Descartar el reporte otra vez",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"ya fue revisado\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(409);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{moderacion}}/api/reportes/{{idReporteComentario}}/descartar",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenModerador}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin banea el comentario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"banea el comentario\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(201);",
+                  "});",
+                  "pm.collectionVariables.set(\"idBaneoComentario\", body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{moderacion}}/api/baneos",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoContenido\": \"COMENTARIO\",\n  \"contenidoId\": {{idComentarioModeracion}},\n  \"normaId\": {{idNormaRespeto}},\n  \"motivo\": \"Comentario de prueba que se banea\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "El comentario baneado no aparece",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"la lista ya no lo trae\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.map((c) => c.id)).to.not.include(pm.collectionVariables.get(\"idComentarioModeracion\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/{{idTemaModeracion}}/comentarios",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Listar baneos activos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"aparece el baneo del comentario\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  pm.expect(body.map((b) => b.id)).to.include(pm.collectionVariables.get(\"idBaneoComentario\"));",
+                  "  body.forEach((b) => pm.expect(b.activo).to.equal(true));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{moderacion}}/api/baneos?activo=true",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Limpieza: levantar baneo del comentario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"levanta el baneo\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{moderacion}}/api/baneos/{{idBaneoComentario}}/levantar",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Limpieza: camila elimina su tema",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.text() ? pm.response.json() : null;",
+                  "",
+                  "pm.test(\"elimina el tema de prueba\", function () {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{publicaciones}}/api/temas/{{idTemaModeracion}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenCamila}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "tokenModerador",
+      "value": ""
+    },
+    {
+      "key": "tokenCamila",
+      "value": ""
+    },
+    {
+      "key": "tokenDiego",
+      "value": ""
+    },
+    {
+      "key": "idCamila",
+      "value": ""
+    },
+    {
+      "key": "idNuevo",
+      "value": ""
+    },
+    {
+      "key": "nombreNuevo",
+      "value": ""
+    },
+    {
+      "key": "idCategoria",
+      "value": ""
+    },
+    {
+      "key": "idCategoriaNueva",
+      "value": ""
+    },
+    {
+      "key": "idTema",
+      "value": ""
+    },
+    {
+      "key": "idComentario",
+      "value": ""
+    },
+    {
+      "key": "sufijo",
+      "value": ""
+    },
+    {
+      "key": "idNormaSpam",
+      "value": ""
+    },
+    {
+      "key": "idNormaRespeto",
+      "value": ""
+    },
+    {
+      "key": "idNormaNueva",
+      "value": ""
+    },
+    {
+      "key": "idTemaModeracion",
+      "value": ""
+    },
+    {
+      "key": "idComentarioModeracion",
+      "value": ""
+    },
+    {
+      "key": "idReporte",
+      "value": ""
+    },
+    {
+      "key": "idReporteComentario",
+      "value": ""
+    },
+    {
+      "key": "idBaneo",
+      "value": ""
+    },
+    {
+      "key": "idBaneoComentario",
+      "value": ""
+    }
+  ]
+}
