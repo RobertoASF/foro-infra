@@ -82,6 +82,18 @@ services:
       retries: 12
       start_period: 30s
 
+  # El frontend trabaja con sus propios datos, no llama a los microservicios
+  frontend:
+    build: ../foro-frontend
+    container_name: foro-frontend
+    ports:
+      - "${FRONTEND_PUERTO:-4200}:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
   # Base nueva: crea los tres esquemas y carga los datos
   cargar-bd:
     <<: *tarea-bd
