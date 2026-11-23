@@ -1,5 +1,22 @@
 name: foro
 
+# Configuración común de las tareas que preparan Oracle Cloud.
+# La imagen se usa solo porque trae SQL*Plus.
+x-tarea-bd: &tarea-bd
+  image: gvenzl/oracle-free:23-slim-faststart
+  environment:
+    DB_ALIAS: ${DB_ALIAS}
+    ORACLE_ADMIN_PASSWORD: ${ORACLE_ADMIN_PASSWORD}
+    DB_USUARIOS_PASSWORD: ${DB_USUARIOS_PASSWORD}
+    DB_PUBLICACIONES_PASSWORD: ${DB_PUBLICACIONES_PASSWORD}
+    DB_MODERACION_PASSWORD: ${DB_MODERACION_PASSWORD}
+  volumes:
+    - ${WALLET_DIR}:/wallet:ro
+    - ./db:/scripts:ro
+    - ../foro-ms-usuarios/db:/sql/usuarios:ro
+    - ../foro-ms-publicaciones/db:/sql/publicaciones:ro
+    - ../foro-ms-moderacion/db:/sql/moderacion:ro
+
 services:
   ms-usuarios:
     build: ../foro-ms-usuarios
@@ -41,18 +58,38 @@ services:
       retries: 12
       start_period: 30s
 
-  # Tarea de una sola vez. Esta imagen se usa solo porque trae SQL*Plus.
+  ms-moderacion:
+    build: ../foro-ms-moderacion
+    container_name: foro-ms-moderacion
+    environment:
+      DB_PASSWORD: ${DB_MODERACION_PASSWORD}
+      JWT_SECRETO: ${JWT_SECRETO}
+      CORS_ORIGEN: ${CORS_ORIGEN}
+      PUBLICACIONES_URL: http://ms-publicaciones:8082
+      LOG_NIVEL: DEBUG
+      TZ: America/Santiago
+    volumes:
+      - ${WALLET_DIR}:/Wallet_dbfullstack3:ro
+    ports:
+      - "8083:8083"
+    depends_on:
+      ms-publicaciones:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  # Base nueva: crea los tres esquemas y carga los datos
   cargar-bd:
-    image: gvenzl/oracle-free:23-slim-faststart
+    <<: *tarea-bd
     profiles: ["carga"]
     entrypoint: ["bash", "/scripts/cargar_bd.sh"]
-    environment:
-      DB_ALIAS: ${DB_ALIAS}
-      ORACLE_ADMIN_PASSWORD: ${ORACLE_ADMIN_PASSWORD}
-      DB_USUARIOS_PASSWORD: ${DB_USUARIOS_PASSWORD}
-      DB_PUBLICACIONES_PASSWORD: ${DB_PUBLICACIONES_PASSWORD}
-    volumes:
-      - ${WALLET_DIR}:/wallet:ro
-      - ./db:/scripts:ro
-      - ../foro-ms-usuarios/db:/sql/usuarios:ro
-      - ../foro-ms-publicaciones/db:/sql/publicaciones:ro
+
+  # Base de la semana 2: agrega moderación y la columna baneado
+  migrar-bd:
+    <<: *tarea-bd
+    profiles: ["carga"]
+    entrypoint: ["bash", "/scripts/migrar_v2.sh"]
