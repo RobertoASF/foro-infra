@@ -1,4 +1,4 @@
-# Despliegue en la nube (Play with Docker) con las imágenes publicadas en Docker Hub.
+# Despliegue en la nube con las imágenes publicadas en Docker Hub.
 # Junto a este archivo deben quedar el .env y la carpeta Wallet_dbfullstack3.
 
 name: foro
@@ -68,4 +68,4 @@ services:
     image: robertoasf/foro-frontend:1.0.0
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "${FRONTEND_PUERTO:-80}:80"
