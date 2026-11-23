@@ -1,0 +1,71 @@
+# Despliegue en la nube (Play with Docker) con las imágenes publicadas en Docker Hub.
+# Junto a este archivo deben quedar el .env y la carpeta Wallet_dbfullstack3.
+
+name: foro
+
+x-microservicio: &microservicio
+  restart: unless-stopped
+  volumes:
+    - ./Wallet_dbfullstack3:/Wallet_dbfullstack3:ro
+
+services:
+  ms-usuarios:
+    <<: *microservicio
+    image: robertoasf/foro-ms-usuarios:1.1.0
+    environment:
+      DB_PASSWORD: ${DB_USUARIOS_PASSWORD}
+      JWT_SECRETO: ${JWT_SECRETO}
+      CORS_ORIGEN: ${CORS_ORIGEN:-*}
+      TZ: America/Santiago
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 40s
+
+  ms-publicaciones:
+    <<: *microservicio
+    image: robertoasf/foro-ms-publicaciones:1.1.0
+    environment:
+      DB_PASSWORD: ${DB_PUBLICACIONES_PASSWORD}
+      JWT_SECRETO: ${JWT_SECRETO}
+      CORS_ORIGEN: ${CORS_ORIGEN:-*}
+      TZ: America/Santiago
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 40s
+
+  ms-moderacion:
+    <<: *microservicio
+    image: robertoasf/foro-ms-moderacion:1.0.0
+    environment:
+      DB_PASSWORD: ${DB_MODERACION_PASSWORD}
+      JWT_SECRETO: ${JWT_SECRETO}
+      CORS_ORIGEN: ${CORS_ORIGEN:-*}
+      PUBLICACIONES_URL: http://ms-publicaciones:8082
+      TZ: America/Santiago
+    ports:
+      - "8083:8083"
+    depends_on:
+      ms-publicaciones:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 40s
+
+  frontend:
+    image: robertoasf/foro-frontend:1.0.0
+    restart: unless-stopped
+    ports:
+      - "80:80"
